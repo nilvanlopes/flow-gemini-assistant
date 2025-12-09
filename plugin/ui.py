@@ -5,7 +5,7 @@ from typing import List
 import os, json
 
 from flowlauncher import FlowLauncher, FlowLauncherAPI
-from plugin.utils import api_request
+from plugin.utils import api_request, copy_to_clipboard, open_in_notepad
 from plugin.templates import *
 from plugin.extensions import _l
 
@@ -149,3 +149,11 @@ class Main(FlowLauncher):
 
         keyword = ActionKeyword
         FlowLauncherAPI.change_query(f"{keyword} ", False)
+    
+    def copy_to_clipboard(self, text):
+        """Copy text to clipboard using pyperclip"""
+        copy_to_clipboard(text)
+    
+    def open_in_notepad(self, text, query):
+        """Open text in Notepad"""
+        open_in_notepad(text, query)

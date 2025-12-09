@@ -5,7 +5,7 @@
 # The script is better to write the core functions.
 import requests
 import tempfile
-import os, json
+import os, subprocess
 from plugin.settings import icon_path
 from plugin.extensions import _l
 
@@ -23,11 +23,21 @@ def api_request(query, model, api_key):
             texto_respuesta = response.json()['candidates'][0]['content']['parts'][0]['text']
             return [
                 {
-                    "Title": texto_respuesta[:100] + "...",
-                    "SubTitle": _l("Press Enter to copy all"),
+                    "Title": _l("Open in Notepad"),
+                    "SubTitle": _l("See the full response in Notepad"),
                     "IcoPath": icon_path,
                     "JsonRPCAction": {
                         "method": "open_in_notepad",
+                        "parameters": [texto_respuesta, clean_query],
+                        "dontHideAfterAction": False
+                    }
+                },
+                {
+                    "Title": _l("Copy to Clipboard"),
+                    "SubTitle": texto_respuesta[:100].replace("\n", " ") + "...",
+                    "IcoPath": icon_path,
+                    "JsonRPCAction": {
+                        "method": "copy_to_clipboard",
                         "parameters": [texto_respuesta],
                         "dontHideAfterAction": False
                     }
@@ -37,12 +47,12 @@ def api_request(query, model, api_key):
             return [{
                 "Title": _l("Error"),
                 "SubTitle": str(e),
-                "IcoPath": "Images/gemini.png"
+                "IcoPath": icon_path
             }]
         
-def open_in_notepad(text):
+def open_in_notepad(text, query):
         try:
-            fd, path = tempfile.mkstemp(suffix=".txt", text=True)
+            fd, path = tempfile.mkstemp(prefix=query[:20].replace(' ', '_') + "_", suffix=".txt", text=True)
             with os.fdopen(fd, 'w', encoding='utf-8') as f:
                 f.write(text)
             os.startfile(path)
@@ -50,25 +60,6 @@ def open_in_notepad(text):
         except Exception as e:
             os.system(f'echo Error al abrir bloc de notas: {str(e)} | clip')
 
-
-def get_keyword():
-    folder_path = os.path.dirname(os.path.abspath(__file__))
-    folder_path = folder_path.split('\\')[:-1]
-    plugin_settings = '\\'.join(folder_path) + "\\plugin.json"
-
-    folder_path = folder_path[:-2]
-    plugins_settings_flowlauncher = '\\'.join(folder_path) + "\\Settings\\settings.json"
-
-    # CONFIG Plugin
-    with open(plugin_settings, 'r') as f:
-        settings = json.load(f)
-        plugin_id = settings["ID"]
-
-    # CONFIG FlowLauncher
-    with open(plugins_settings_flowlauncher, 'r') as f:
-        settings = json.load(f)
-        settings = settings["PluginSettings"]["Plugins"]
-        find_plugin = {key: value for key, value in settings.items() if key == plugin_id}
-        ActionKeywords = find_plugin[plugin_id]["ActionKeywords"][0]
-
-    return ActionKeywords
+def copy_to_clipboard(text):
+    cmd = 'echo '+text.strip()+'|clip'
+    subprocess.check_call(cmd, shell=True)

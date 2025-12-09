@@ -27,10 +27,11 @@ with open(plugins_settings_flowlauncher, 'r') as f:
     find_plugin = {key: value for key, value in settings.items() if key == plugin_id}
     ActionKeyword = find_plugin[plugin_id]["ActionKeywords"][0]
 
-# GET SETTINGS FILE FLOW LAUNCHER
-settings_file = os.path.join(basedir.parent.parent, "Settings", "Plugins", plugin_name, "settings.json")
+# GET SETTINGS
+settings_file = os.path.join(basedir, "config.json")
 if not os.path.exists(settings_file):
-    os.makedirs(os.path.dirname(settings_file), exist_ok=True)
+    with open(settings_file, 'w') as f:
+        json.dump({"api_key": "", "model": ""}, f, indent=4)
 
 
 # Add lib directory to path

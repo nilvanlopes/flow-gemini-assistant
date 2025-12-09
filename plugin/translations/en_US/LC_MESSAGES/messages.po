@@ -64,8 +64,14 @@ msgid "Write your query with || at the end to get the response..."
 msgstr "Write your query with || at the end to get the response..."
 
 # API response
-msgid "Press Enter to copy all"
-msgstr "Press Enter to copy all"
+msgid "Copy to Clipboard"
+msgstr "Copy to Clipboard"
+
+msgid "Open in Notepad"
+msgstr "Open in Notepad"
+
+msgid "See the full response in Notepad"
+msgstr "See the full response in Notepad"
 
 # Error messages
 msgid "Error"
